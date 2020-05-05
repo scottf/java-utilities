@@ -44,6 +44,10 @@ class SimpleDate(val year: Int, val month: Int, val day: Int) : Comparable<Simpl
             cal.time = date
             return newInstance(cal)
         }
+
+        fun newInstance(): SimpleDate {
+            return newInstance(Calendar.getInstance())
+        }
     }
 
     private val DASH = "-"
@@ -145,7 +149,7 @@ class SimpleDate(val year: Int, val month: Int, val day: Int) : Comparable<Simpl
     fun addDays(increment: Int): SimpleDate {
         return add(Calendar.DATE, increment)
     }
-    
+
     fun add(field: Int, increment: Int): SimpleDate {
         val gc = getCalendar()
         gc.add(field, increment)
