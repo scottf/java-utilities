@@ -151,32 +151,4 @@ class SimpleDate(val year: Int, val month: Int, val day: Int) : Comparable<Simpl
         gc.time
         return gc
     }
-
-    // ----------------------------------------------------------------------------------------------------
-    // CONSTRUCTOR HELPERS
-    // ----------------------------------------------------------------------------------------------------
-    private fun validateConstruction(message: String) {
-        require(!(year < 1000 || month < 1 || month > 12 || invalidDay())) { message }
-    }
-
-    private fun invalidDay(): Boolean {
-        if (day < 1) {
-            return true
-        }
-        when (month) {
-            1, 3, 5, 7, 8, 10, 12 -> return day > 31
-            4, 6, 9, 11 -> return day > 30
-            2 -> return if (isLeapYear()) day > 29 else day > 28
-        }
-        return false
-    }
-
-    private fun isLeapYear(): Boolean {
-        if (year % 400 == 0) {
-            return true
-        }
-        return if (year % 100 == 0) {
-            false
-        } else year % 4 == 0
-    }
 }
