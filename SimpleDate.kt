@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+package com.efiia.logstat.utils
+
 import java.util.*
 
 class SimpleDate(val year: Int, val month: Int, val day: Int) : Comparable<SimpleDate> {
@@ -25,11 +27,12 @@ class SimpleDate(val year: Int, val month: Int, val day: Int) : Comparable<Simpl
             return SimpleDate(sd.year, sd.month, sd.day)
         }
 
-        fun newInstance(number: Int): SimpleDate {
-            var year = number / 10000
-            var month = ((number - (year * 10000)) / 100)
-            val day = (number - (year * 10000) - (month * 100))
-            return SimpleDate(year, month, day)
+        fun newInstance(number: Number): SimpleDate {
+            val iNumber = number.toInt()
+            val _year = iNumber / 10000
+            val _month = ((iNumber - (_year * 10000)) / 100)
+            val _day = (iNumber - (_year * 10000) - (_month * 100))
+            return SimpleDate(_year, _month, _day)
         }
 
         fun newInstance(cal: Calendar): SimpleDate {
@@ -139,14 +142,14 @@ class SimpleDate(val year: Int, val month: Int, val day: Int) : Comparable<Simpl
         return getCalendar().timeInMillis
     }
 
-    fun add(field: Int, increment: Int): SimpleDate {
-        return newInstance(addGetCalendar(field, increment))
+    fun addDays(increment: Int): SimpleDate {
+        return add(Calendar.DATE, increment)
     }
-
-    fun addGetCalendar(field: Int, increment: Int): GregorianCalendar {
+    
+    fun add(field: Int, increment: Int): SimpleDate {
         val gc = getCalendar()
         gc.add(field, increment)
         gc.time
-        return gc
+        return newInstance(gc)
     }
 }
