@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-package com.efiia.logstat.utils
-
 import java.util.*
 
 class SimpleDate(val year: Int, val month: Int, val day: Int) : Comparable<SimpleDate> {
