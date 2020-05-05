@@ -141,7 +141,7 @@ class SimpleDate private constructor(_year: Int, _month: Int, _day: Int, _number
         return cal
     }
 
-    fun toDate(): Date? {
+    fun toDate(): Date {
         return toCalendar().time
     }
 
