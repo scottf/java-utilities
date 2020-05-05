@@ -69,35 +69,27 @@ class SimpleDate private constructor(_year: Int, _month: Int, _day: Int, _number
         return number.compareTo(other.number)
     }
 
-    fun before(o: SimpleDate?): Boolean {
-        return compareTo(o!!) < 0
+    fun before(o: SimpleDate): Boolean {
+        return compareTo(o) < 0
     }
 
-    fun beforeOrEqual(o: SimpleDate?): Boolean {
-        return compareTo(o!!) <= 0
+    fun beforeOrEqual(o: SimpleDate): Boolean {
+        return compareTo(o) <= 0
     }
 
-    fun after(o: SimpleDate?): Boolean {
-        return compareTo(o!!) > 0
+    fun after(o: SimpleDate): Boolean {
+        return compareTo(o) > 0
     }
 
-    fun afterOrEqual(o: SimpleDate?): Boolean {
-        return compareTo(o!!) >= 0
+    fun afterOrEqual(o: SimpleDate): Boolean {
+        return compareTo(o) >= 0
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) return true
-        if (o == null || javaClass != o.javaClass) return false
-        val that = o as SimpleDate
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || javaClass != other.javaClass) return false
+        val that = other as SimpleDate
         return number == that.number
-    }
-
-    fun equals(s: String?): Boolean {
-        return s != null && toString() == s
-    }
-
-    fun equals(n: Number?): Boolean {
-        return n != null && number == n
     }
 
     override fun hashCode(): Int {
