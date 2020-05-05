@@ -18,45 +18,53 @@ package com.efiia.logstat.utils
 
 import java.util.*
 
-class SimpleDate(val year: Int, val month: Int, val day: Int) : Comparable<SimpleDate> {
+class SimpleDate private constructor(_year: Int, _month: Int, _day: Int, _number: Number?) : Comparable<SimpleDate> {
 
-    val number = year * 10000 + month * 100 + day
+    val year: Int
+    val month: Int
+    val day: Int
+    val number: Int
 
-    companion object Factory {
-        fun newInstance(sd: SimpleDate): SimpleDate {
-            return SimpleDate(sd.year, sd.month, sd.day)
+    init {
+        if (_number == null) {
+            year = _year
+            month = _month
+            day = _day
+            number = year * 10000 + month * 100 + day
         }
-
-        fun newInstance(number: Number): SimpleDate {
-            val iNumber = number.toInt()
-            val _year = iNumber / 10000
-            val _month = ((iNumber - (_year * 10000)) / 100)
-            val _day = (iNumber - (_year * 10000) - (_month * 100))
-            return SimpleDate(_year, _month, _day)
-        }
-
-        fun newInstance(cal: Calendar): SimpleDate {
-            return SimpleDate(cal[Calendar.YEAR], cal[Calendar.MONTH] + 1, cal[Calendar.DATE])
-        }
-
-        fun newInstance(date: Date): SimpleDate {
-            val cal = Calendar.getInstance()
-            cal.time = date
-            return newInstance(cal)
-        }
-
-        fun newInstance(): SimpleDate {
-            return newInstance(Calendar.getInstance())
+        else {
+            number = _number.toInt()
+            year = number / 10000
+            month = ((number - (year * 10000)) / 100)
+            day = (number - (year * 10000) - (month * 100))
         }
     }
 
-    private val DASH = "-"
-    private val EMPTY = ""
-    private val ZERO = "0"
+    constructor(number: Number)  : this(-1, -1, -1, number)
+    constructor(year: Int, month : Int, day: Int) : this(year, month, day, null)
+    constructor(sd: SimpleDate)  : this(sd.year, sd.month, sd.day, null)
+    constructor(cal: Calendar)   : this(cal[Calendar.YEAR], cal[Calendar.MONTH] + 1, cal[Calendar.DATE], null)
+    constructor(date: Date)      : this(Calendar.getInstance().run { time = date; this })
+    constructor()                : this(Calendar.getInstance())
 
-    // ----------------------------------------------------------------------------------------------------
-    // COMPARATOR
-    // ----------------------------------------------------------------------------------------------------
+    companion object {
+        private const val DASH = "-"
+        private const val EMPTY = ""
+        private const val ZERO = "0"
+
+        fun addDays(simpleDate: SimpleDate, increment: Int): SimpleDate {
+            return add(simpleDate, Calendar.DATE, increment)
+        }
+
+        fun add(simpleDate: SimpleDate, field: Int, increment: Int): SimpleDate {
+            val gc = simpleDate.toCalendar()
+            gc.add(field, increment)
+            gc.time
+            return SimpleDate(gc)
+        }
+
+    }
+
     override fun compareTo(other: SimpleDate): Int {
         return number.compareTo(other.number)
     }
@@ -126,34 +134,26 @@ class SimpleDate(val year: Int, val month: Int, val day: Int) : Comparable<Simpl
             (if (day > 9) EMPTY else ZERO) + day
     }
 
-    fun getCalendar(): GregorianCalendar {
-        return getCalendar(null)
+    fun toCalendar(): Calendar {
+        return toCalendar(null)
     }
 
-    fun getCalendar(tz: TimeZone?): GregorianCalendar {
-        val gc = tz?.let { GregorianCalendar(it) } ?: GregorianCalendar()
-        gc.set(year, month - 1, day, 0, 0, 0)
-        gc.set(Calendar.MILLISECOND, 0)
-        gc.time
-        return gc
+    fun toCalendar(tz: TimeZone?): Calendar {
+        val cal = Calendar.getInstance()
+        if (tz != null) {
+            cal.timeZone = tz
+        }
+        cal.set(year, month - 1, day, 0, 0, 0)
+        cal.set(Calendar.MILLISECOND, 0)
+        cal.time
+        return cal
     }
 
-    fun getDate(): Date? {
-        return getCalendar().time
+    fun toDate(): Date? {
+        return toCalendar().time
     }
 
-    fun getMilliseconds(): Long {
-        return getCalendar().timeInMillis
-    }
-
-    fun addDays(increment: Int): SimpleDate {
-        return add(Calendar.DATE, increment)
-    }
-
-    fun add(field: Int, increment: Int): SimpleDate {
-        val gc = getCalendar()
-        gc.add(field, increment)
-        gc.time
-        return newInstance(gc)
+    fun toMilliseconds(): Long {
+        return toCalendar().timeInMillis
     }
 }
