@@ -12,4 +12,4 @@ Java class to represent a 64 bit unsigned long
 
 ### Simple Date
 
-Class in Java or Kotlin for manipualting a date in simple form i.e. 20100101
+Class in Java or Kotlin for manipulating a date in simple form i.e. 20100101
