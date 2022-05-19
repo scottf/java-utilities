@@ -1,6 +1,6 @@
 ### Cancellable Count Down Latch
 
-Improvement on CountDownlatch that adds abilit to cancel the count down, immediately freeing the latch.
+Improvement on CountDownlatch that adds ability to cancel the count down, immediately freeing the latch.
 
 ### GZipper
 
