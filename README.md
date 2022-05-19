@@ -1,10 +1,14 @@
-### Cancellable Count Down Latch
+### CancellableCountDownLatch
 
 Improvement on CountDownlatch that adds ability to cancel the count down, immediately freeing the latch.
 
 ### GZipper
 
 Utility to make gzipping easy.
+
+### Json Reader / Writer
+
+Utility to simplify the most common json tasks.
 
 ### Ulong
 
