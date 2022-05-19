@@ -15,4 +15,4 @@ Improvement on CountDownlatch that adds abilit to cancel the count down, immedia
 
 Utility to make gzipping easy.
 
-[GZipper.java](GZipper.java}
+[GZipper.java](GZipper.java)
