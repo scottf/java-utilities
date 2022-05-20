@@ -16,29 +16,29 @@ I literally don't care what you do with this code or if you attribute it to me. 
 
 ### ByteArrayBuilder
 
-[ByteArrayBuilder.java](src/main/java/io/arondight/ByteArrayBuilder.java)
+[ByteArrayBuilder.java](src/main/java/scottf/ByteArrayBuilder.java)
 is an nifty wrapper around java.nio.ByteBuffer. 
 It makes it easy to use ByteBuffer but doesn't require you to know how many bytes you need to allocate
 since it does the work to grow the buffer as you add data.
 
 ### CancellableCountDownLatch
 
-[CancellableCountDownLatch.java](src/main/java/io/arondight/CancellableCountDownLatch.java)
+[CancellableCountDownLatch.java](src/main/java/scottf/CancellableCountDownLatch.java)
 is an improvement on CountDownlatch that adds ability to cancel the count down, immediately freeing the latch.
 
 ### GZipper
 
-[GZipper.java](src/main/java/io/arondight/GZipper.java)
+[GZipper.java](src/main/java/scottf/GZipper.java)
 is a utility to make gzipping easy.
 
 ### Json Reader / Writer
 
-[JsonReader.java](src/main/java/io/arondight/JsonReader.java) and [JsonWriter.java](src/main/java/io/arondight/JsonWriter.java)
+[JsonReader.java](src/main/java/scottf/JsonReader.java) and [JsonWriter.java](src/main/java/scottf/JsonWriter.java)
 are utilities to simplify the common json tasks.
 
 ### ParseNumber
 
-[ParseNumber.java](src/main/java/io/arondight/ParseNumber.java)
+[ParseNumber.java](src/main/java/scottf/ParseNumber.java)
 is a utility for parsing human-readable numbers that might make input easier,
 
 | Example      | Java Long Value |
@@ -55,10 +55,10 @@ is a utility for parsing human-readable numbers that might make input easier,
 
 ### SimpleDate
 
-[SimpleDate.java](src/main/java/io/arondight/SimpleDate.java)
+[SimpleDate.java](src/main/java/scottf/SimpleDate.java)
 is a utility for manipulating a date in simple form i.e. 20100101
 
 ### Ulong
 
-[Ulong.java](src/main/java/io/arondight/Ulong.java)
+[Ulong.java](src/main/java/scottf/Ulong.java)
 is an object that represents a 64 bit unsigned long
