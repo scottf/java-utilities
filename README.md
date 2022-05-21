@@ -26,6 +26,11 @@ since it does the work to grow the buffer as you add data.
 [CancellableCountDownLatch.java](src/main/java/scottf/CancellableCountDownLatch.java)
 is an improvement on CountDownlatch that adds ability to cancel the count down, immediately freeing the latch.
 
+### Digester
+
+[Digester.java](src/main/java/scottf/Digester.java)
+is a utility to building a digest of a large amount of data like a stream that is read a chunk at a time.
+
 ### GZipper
 
 [GZipper.java](src/main/java/scottf/GZipper.java)
