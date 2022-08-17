@@ -1,43 +1,41 @@
 package scottf;
 
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 public class Digester {
-    String DEFAULT_DIGEST_ALGORITHM = "SHA-256";
+    private static final String DEFAULT_DIGEST_ALGORITHM = "SHA-256";
+    private static final Charset DEFAULT_STRING_ENCODING = StandardCharsets.UTF_8;
 
-    private final MessageDigest digest;
+    private final Charset stringCharset;
     private final Base64.Encoder encoder;
+    private final MessageDigest digest;
 
     public Digester() throws NoSuchAlgorithmException {
-        this.digest = MessageDigest.getInstance(DEFAULT_DIGEST_ALGORITHM);
-        encoder = Base64.getUrlEncoder();
+        this(null, null, null);
     }
 
     public Digester(Base64.Encoder encoder) throws NoSuchAlgorithmException {
-        this.digest = MessageDigest.getInstance(DEFAULT_DIGEST_ALGORITHM);
-        this.encoder = encoder;
+        this(null, null, encoder);
     }
 
-    public Digester(String algorithm) throws NoSuchAlgorithmException {
-        this.digest = MessageDigest.getInstance(algorithm);
-        encoder = Base64.getUrlEncoder();
+    public Digester(String digestAlgorithm) throws NoSuchAlgorithmException {
+        this(digestAlgorithm, null, null);
     }
 
-    public Digester(String algorithm, Base64.Encoder encoder) throws NoSuchAlgorithmException {
-        this.digest = MessageDigest.getInstance(algorithm);
-        this.encoder = encoder;
+    public Digester(String digestAlgorithm, Charset stringCharset, Base64.Encoder encoder) throws NoSuchAlgorithmException {
+        this.stringCharset = stringCharset == null ? DEFAULT_STRING_ENCODING : stringCharset;
+        this.encoder = encoder == null ? Base64.getUrlEncoder() : encoder;
+        this.digest = MessageDigest.getInstance(
+            digestAlgorithm == null ? DEFAULT_DIGEST_ALGORITHM : digestAlgorithm);
     }
 
     public Digester update(String input) {
-        digest.update(input.getBytes(StandardCharsets.UTF_8));
+        digest.update(input.getBytes(stringCharset));
         return this;
-    }
-
-    public Digester update(long input) {
-        return update(Long.toString(input));
     }
 
     public Digester update(byte[] input) {
@@ -56,10 +54,6 @@ public class Digester {
     }
 
     public Digester reset(String input) {
-        return reset().update(input);
-    }
-
-    public Digester reset(long input) {
         return reset().update(input);
     }
 
