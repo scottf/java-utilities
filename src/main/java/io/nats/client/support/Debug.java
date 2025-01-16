@@ -18,8 +18,6 @@ import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-// MODIFIED 1/16/2024
-
 @SuppressWarnings("SameParameterValue")
 public abstract class Debug {
 
