@@ -1,4 +1,4 @@
-package scottf;
+package io.nats.client.support;
 
 import io.nats.client.Connection;
 import io.nats.client.JetStreamApiException;
@@ -11,14 +11,14 @@ import io.nats.client.api.StreamInfo;
 import io.nats.client.impl.Headers;
 import io.nats.client.impl.NatsJetStreamMetaData;
 import io.nats.client.impl.NatsMessage;
-import io.nats.client.support.DateTimeUtils;
-import io.nats.client.support.JsonSerializable;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+
+// MODIFIED 1/16/2024
 
 @SuppressWarnings("SameParameterValue")
 public abstract class Debug {
@@ -336,7 +336,7 @@ public abstract class Debug {
 
     public static void consumer(JetStreamManagement jsm, String stream, String conName) throws IOException, JetStreamApiException {
         ConsumerInfo ci = jsm.getConsumerInfo(stream, conName);
-        DEBUG_PRINTER.println("Consumer numPending=" + ci.getNumPending() + " numWaiting=" + ci.getNumWaiting() + " numAckPending=" + ci.getNumAckPending());
+        DEBUG_PRINTER.println("Consumer pending=" + ci.getNumPending() + " waiting=" + ci.getNumWaiting() + " ackPending=" + ci.getNumAckPending());
     }
 
     public static void printStreamInfo(StreamInfo si) {
@@ -401,10 +401,10 @@ public abstract class Debug {
     public static String consumerInfoString(ConsumerInfo ci) {
         return ci == null ? "null" :
             "Consumer{" +
-                "numPending=" + ci.getNumPending() +
-                ", numWaiting=" + ci.getNumWaiting() +
-                ", numAckPending=" + ci.getNumAckPending() +
-                ", numRedelivered=" + ci.getRedelivered() +
+                "pending=" + ci.getNumPending() +
+                ", waiting=" + ci.getNumWaiting() +
+                ", ackPending=" + ci.getNumAckPending() +
+                ", redelivered=" + ci.getRedelivered() +
                 ", delivered=" + sequenceInfoString(ci.getDelivered()) +
                 ", ackFloor=" + sequenceInfoString(ci.getAckFloor()) +
                 "} ";
