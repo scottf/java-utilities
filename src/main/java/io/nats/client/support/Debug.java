@@ -198,7 +198,7 @@ public abstract class Debug {
 
     public static String time() {
         String t = "" + System.currentTimeMillis();
-        return t.substring(t.length() - 9);
+        return t.substring(t.length() - 10);
     }
 
     public static String dataString(Message msg) {
