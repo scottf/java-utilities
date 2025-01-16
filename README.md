@@ -14,10 +14,17 @@ I literally don't care what you do with this code or if you attribute it to me. 
 
 -scott
 
+### Debug 
+
+[Debug.java](src/main/java/scottf/Debug.java)
+Is a class I used to debug the NATS Java client as I work on it. 
+I don't check it into that project on purpose because I don't ever want to leave debug in the client and CI build
+will fail if I forget!
+
 ### ByteArrayBuilder
 
 [ByteArrayBuilder.java](src/main/java/scottf/ByteArrayBuilder.java)
-is an nifty wrapper around java.nio.ByteBuffer. 
+is an nifty wrapper around java.nio.ByteBuffer.
 It makes it easy to use ByteBuffer but doesn't require you to know how many bytes you need to allocate
 since it does the work to grow the buffer as you add data.
 
