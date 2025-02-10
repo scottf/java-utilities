@@ -1,4 +1,4 @@
-package io.nats.client.support;
+package scottf;
 
 import io.nats.client.Connection;
 import io.nats.client.JetStreamApiException;
@@ -11,6 +11,8 @@ import io.nats.client.api.StreamInfo;
 import io.nats.client.impl.Headers;
 import io.nats.client.impl.NatsJetStreamMetaData;
 import io.nats.client.impl.NatsMessage;
+import io.nats.client.support.DateTimeUtils;
+import io.nats.client.support.JsonSerializable;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
