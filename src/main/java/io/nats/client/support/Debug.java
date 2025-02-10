@@ -305,6 +305,22 @@ public abstract class Debug {
             }
             return new String((byte[])o);
         }
+        if (o instanceof String[]) {
+            StringBuilder sb = new StringBuilder();
+            boolean first = true;
+            for (String s : (String[])o) {
+                if (first) {
+                    first = false;
+                }
+                else {
+                    sb.append(", ");
+                }
+                sb.append('\'')
+                    .append(s == null ? "<null>" : (s.isEmpty() ? "<empty>" : s))
+                    .append('\'');
+            }
+            return sb.toString();
+        }
         String s = o.toString().trim();
         return s.isEmpty() ? "<empty>" : s;
     }
