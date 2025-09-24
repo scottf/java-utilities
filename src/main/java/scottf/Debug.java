@@ -66,23 +66,33 @@ public abstract class Debug {
         if (PAUSE) { return; }
         String m = t.getMessage();
         if (m == null) {
-            info(label);
+            info(label, "Stack Trace");
         }
         else {
-            info(label, t.getMessage());
+            info(label, "Stack Trace", t.getMessage());
         }
+        boolean compress = false;
         StackTraceElement[] elements = t.getStackTrace();
         for (int i = 0; i < elements.length; i++) {
             String ts = elements[i].toString();
-            if (i == 0) {
-                info(label, ts);
-            }
-            else {
-                info(label, ">   " + ts);
+            if (i > 0) {
+                if (ts.startsWith("io.nats")) {
+                    if (compress) {
+                        info(label, ">  ...");
+                    }
+                    info(label, ">  " + ts);
+                    compress = false;
+                }
+                else {
+                    compress = true;
+                }
             }
             if (ts.startsWith("java")) {
                 break;
             }
+        }
+        if (compress) {
+            info(label, ">  ...");
         }
     }
 
@@ -199,8 +209,7 @@ public abstract class Debug {
     }
 
     public static String time() {
-        String t = "" + System.currentTimeMillis();
-        return t.substring(t.length() - 10);
+        return "" + System.currentTimeMillis();
     }
 
     public static String dataString(Message msg) {
@@ -323,7 +332,7 @@ public abstract class Debug {
             }
             return sb.toString();
         }
-        String s = o.toString().trim();
+        String s = o.toString();
         return s.isEmpty() ? "<empty>" : s;
     }
 
