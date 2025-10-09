@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import static io.nats.client.support.DateTimeUtils.toRfc3339;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @SuppressWarnings("SameParameterValue")
@@ -27,13 +28,18 @@ public abstract class Debug {
         void println(String s);
     }
 
+    public static final int NO_TIME = 0;
+    public static final int REGULAR_TIME = 1;
+    public static final int RFC_TIME = -1;
+    public static final int RFC_SHORT_TIME = -2;
+
     public static final String SEP = " | ";
     public static final String DIV = "/";
     public static final String PAD = "                                                                                                                                                                                                                                                                                                                                                                                                                                    ";
     public static final String REPLACE = "\\Q%s\\E";
     public static boolean DO_NOT_TRUNCATE = true;
     public static boolean PRINT_THREAD_ID = true;
-    public static boolean PRINT_TIME = true;
+    public static int TIME_TYPE = REGULAR_TIME;
     public static boolean PAUSE = false;
     public static DebugPrinter DEBUG_PRINTER = System.out::println;
     public static int MAX_DATA_DISPLAY = 50;
@@ -112,10 +118,10 @@ public abstract class Debug {
     public static void info(String label, Message msg, boolean forMsg, String extra) {
         if (PAUSE) { return; }
         String start;
-        if (PRINT_TIME && PRINT_THREAD_ID) {
+        if (TIME_TYPE > NO_TIME && PRINT_THREAD_ID) {
             start = "[" + Thread.currentThread().getName() + "@" + time() + "] ";
         }
-        else if (PRINT_TIME){
+        else if (TIME_TYPE > NO_TIME){
             start = "[" + time() + "] ";
         }
         else if (PRINT_THREAD_ID){
@@ -209,7 +215,28 @@ public abstract class Debug {
     }
 
     public static String time() {
+        switch (TIME_TYPE) {
+            case RFC_TIME: return rfcTime();
+            case RFC_SHORT_TIME: return rfcShortTime();
+        }
         return "" + System.currentTimeMillis();
+    }
+
+    // RFC 2025-02-15T14:09:45
+    public static String rfcTime() {
+        return toRfc3339(DateTimeUtils.gmtNow()).substring(0, 19);
+    }
+
+    public static String rfcTime(ZonedDateTime zdt) {
+        return toRfc3339(zdt).substring(0, 19);
+    }
+
+    public static String rfcShortTime() {
+        return rfcShortTime(DateTimeUtils.gmtNow());
+    }
+
+    public static String rfcShortTime(ZonedDateTime zdt) {
+        return toRfc3339(zdt).substring(0, 19).replace("-", "").replace(":", "");
     }
 
     public static String dataString(Message msg) {
@@ -217,6 +244,12 @@ public abstract class Debug {
         if (data == null || data.length == 0) {
             return "<no data>" + SEP;
         }
+
+        if (data[0] < 32) {
+            // this must be actual binary data, probably filler test data
+            return "<binary " + data.length + " bytes>" + SEP;
+        }
+
         String s = new String(data, UTF_8);
         if (DO_NOT_TRUNCATE) {
             return s + SEP;

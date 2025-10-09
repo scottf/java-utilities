@@ -15,20 +15,37 @@ package scottf;
 
 import io.nats.client.Connection;
 import io.nats.client.ConnectionListener;
-import io.nats.client.api.ServerInfo;
 
 public class DebugConnectionListener implements ConnectionListener {
+    String label;
+
+    public DebugConnectionListener() {
+        this(null);
+    }
+
+    public DebugConnectionListener(String label) {
+        label(label);
+    }
+
+    public void label(String clLabel) {
+        this.label = clLabel == null ? "CL" : clLabel;
+    }
+
     @Override
     public void connectionEvent(Connection conn, Events type) {
-        if (type == Events.CONNECTED) {
-            ServerInfo si = conn.getServerInfo();
-            Debug.info("Connected", si.getServerId(), "Port: " + si.getPort());
+        if (label != null) {
+            Debug.info(label, string(conn), "Event: %s", type.getEvent());
         }
-        else if (type.isConnectionEvent()) {
-            Debug.info("Connection", type.getEvent());
+    }
+
+    @Override
+    public void connectionEvent(Connection conn, Events type, Long time, String uriDetails) {
+        if (label != null) {
+            Debug.info(label, "@%s", time, string(conn), "Event: %s", type.getEvent(), uriDetails);
         }
-        else {
-            Debug.info("Listener", type.getEvent());
-        }
+    }
+
+    private String string(Connection conn) {
+        return "Connection(" + conn.hashCode() + ") " + conn.getStatus();
     }
 }
