@@ -5,12 +5,13 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
 public class ByteArrayBuilder {
     public static final int DEFAULT_ASCII_ALLOCATION = 32;
     public static final int DEFAULT_OTHER_ALLOCATION = 64;
-    public static final byte[] NULL = "null".getBytes(US_ASCII);
+    public static final byte[] NULL = "null".getBytes(ISO_8859_1);
 
     private final Charset defaultCharset;
     private ByteBuffer buffer;
@@ -19,44 +20,43 @@ public class ByteArrayBuilder {
     /**
      * Construct the ByteArrayBuilder with
      * the initial size and allocation size of {@value #DEFAULT_ASCII_ALLOCATION}
-     * and the character set {@link java.nio.charset.StandardCharsets#US_ASCII}
+     * and the character set {@link java.nio.charset.StandardCharsets#ISO_8859_1}
+     * since ISO_8859_1 is faster when encoding and decoding than US_ASCII
      */
     public ByteArrayBuilder() {
-        this(DEFAULT_ASCII_ALLOCATION, DEFAULT_ASCII_ALLOCATION, US_ASCII);
+        this(DEFAULT_ASCII_ALLOCATION, DEFAULT_ASCII_ALLOCATION, ISO_8859_1);
     }
 
     /**
      * Construct the ByteArrayBuilder with the supplied initial size,
      * allocation size of {@value #DEFAULT_ASCII_ALLOCATION}
-     * and the character set {@link java.nio.charset.StandardCharsets#US_ASCII}
-     *
+     * and the character set {@link java.nio.charset.StandardCharsets#ISO_8859_1}
+     * since ISO_8859_1 is faster when encoding and decoding than US_ASCII
      * @param initialSize the initial size
      */
     public ByteArrayBuilder(int initialSize) {
-        this(initialSize, DEFAULT_ASCII_ALLOCATION, US_ASCII);
+        this(initialSize, DEFAULT_ASCII_ALLOCATION, ISO_8859_1);
     }
 
     /**
-     * Construct the ByteArrayBuilder with an existing byte array using it's
+     * Construct the ByteArrayBuilder with an existing byte array using its
      * length as the initial length, the allocation size the larger of
      * the length and {@value #DEFAULT_ASCII_ALLOCATION},
-     * and the character set {@link java.nio.charset.StandardCharsets#US_ASCII}
-     *
+     * and the character set {@link java.nio.charset.StandardCharsets#ISO_8859_1}
+     * since ISO_8859_1 is faster when encoding and decoding than US_ASCII
      * Then initializes the buffer with the supplied bytes
-     *
      * @param bytes the bytes
      */
     public ByteArrayBuilder(byte[] bytes) {
         allocationSize = Math.max(DEFAULT_ASCII_ALLOCATION, bytes.length);
         this.buffer = ByteBuffer.allocate(bytes.length);
-        this.defaultCharset = US_ASCII;
+        this.defaultCharset = ISO_8859_1;
         buffer.put(bytes, 0, bytes.length);
     }
 
     /**
      * Construct the ByteArrayBuilder with the supplied character set
      * with the default initial size and allocation size determined by that character set
-     *
      * @param defaultCharset the default character set
      */
     public ByteArrayBuilder(Charset defaultCharset) {
@@ -66,7 +66,6 @@ public class ByteArrayBuilder {
     /**
      * Construct the ByteArrayBuilder with the supplied initial size and character set
      * with the allocation size determined by that character set.
-     *
      * @param initialSize the initial size
      * @param defaultCharset the default character set
      */
@@ -78,15 +77,15 @@ public class ByteArrayBuilder {
     /**
      * Construct the ByteArrayBuilder with the supplied initial size,
      * allocation size and character set
-     *
      * @param initialSize the initial size
      * @param allocationSize the allocationSize size
      * @param defaultCharset the default character set
      */
     public ByteArrayBuilder(int initialSize, int allocationSize, Charset defaultCharset) {
-        this.allocationSize = allocationSize > 0 ? allocationSize : (defaultCharset == US_ASCII ? DEFAULT_ASCII_ALLOCATION : DEFAULT_OTHER_ALLOCATION);
-        int bytesNeeeded = initialSize > 0 ? initialSize : (defaultCharset == US_ASCII ? DEFAULT_ASCII_ALLOCATION : DEFAULT_OTHER_ALLOCATION);
-        this.buffer = ByteBuffer.allocate(bytesNeeeded);
+        int alSize = defaultCharset == ISO_8859_1 || defaultCharset == US_ASCII ? DEFAULT_ASCII_ALLOCATION : DEFAULT_OTHER_ALLOCATION;
+        this.allocationSize = allocationSize > 0 ? allocationSize : alSize;
+        int bytesNeeded = initialSize > 0 ? initialSize : alSize;
+        this.buffer = ByteBuffer.allocate(bytesNeeded);
         this.defaultCharset = defaultCharset;
     }
 
@@ -179,7 +178,7 @@ public class ByteArrayBuilder {
     }
 
     /**
-     * Clear the buffer, resetting it's length
+     * Clear the buffer, resetting its length
      *
      * @return this (fluent)
      */
@@ -207,7 +206,7 @@ public class ByteArrayBuilder {
      * @return this (fluent)
      */
     public ByteArrayBuilder append(int i) {
-        append(Integer.toString(i).getBytes(US_ASCII)); // a number is always ascii
+        append(Integer.toString(i).getBytes(ISO_8859_1)); // a number is always ascii
         return this;
     }
 

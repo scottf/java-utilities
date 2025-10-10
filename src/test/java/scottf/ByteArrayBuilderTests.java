@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ByteArrayBuilderTests {
@@ -30,7 +31,7 @@ public class ByteArrayBuilderTests {
     public void byte_array_builder_works() {
         ByteArrayBuilder bab = new ByteArrayBuilder();
         String testString = "abcdefghij";
-        _test(PRAND, bab, Collections.singletonList(testString), StandardCharsets.US_ASCII);
+        _test(PRAND, bab, Collections.singletonList(testString), ISO_8859_1);
     }
 
     @Test
@@ -46,7 +47,7 @@ public class ByteArrayBuilderTests {
     public void copyTo() {
         ByteArrayBuilder bab = new ByteArrayBuilder();
         bab.append("0123456789");
-        byte[] target = "AAAAAAAAAAAAAAAAAAAA".getBytes(StandardCharsets.US_ASCII);
+        byte[] target = "AAAAAAAAAAAAAAAAAAAA".getBytes(ISO_8859_1);
         assertEquals(10, bab.copyTo(target, 0));
         assertEquals(10, bab.copyTo(target, 10));
         assertEquals("01234567890123456789", new String(target));
@@ -61,19 +62,19 @@ public class ByteArrayBuilderTests {
         bab = new ByteArrayBuilder(-1, StandardCharsets.UTF_8);
         assertEquals(ByteArrayBuilder.DEFAULT_OTHER_ALLOCATION, bab.internalArray().length);
 
-        bab = new ByteArrayBuilder(-1, -1, StandardCharsets.US_ASCII);
+        bab = new ByteArrayBuilder(-1, -1, ISO_8859_1);
         assertEquals(ByteArrayBuilder.DEFAULT_ASCII_ALLOCATION, bab.internalArray().length);
 
         bab = new ByteArrayBuilder(-1, -1, StandardCharsets.UTF_8);
         assertEquals(ByteArrayBuilder.DEFAULT_OTHER_ALLOCATION, bab.internalArray().length);
 
-        bab = new ByteArrayBuilder(-1, 100, StandardCharsets.US_ASCII);
+        bab = new ByteArrayBuilder(-1, 100, ISO_8859_1);
         assertEquals(ByteArrayBuilder.DEFAULT_ASCII_ALLOCATION, bab.internalArray().length);
 
         bab = new ByteArrayBuilder(-1, 100, StandardCharsets.UTF_8);
         assertEquals(ByteArrayBuilder.DEFAULT_OTHER_ALLOCATION, bab.internalArray().length);
 
-        bab = new ByteArrayBuilder(100, -1, StandardCharsets.US_ASCII);
+        bab = new ByteArrayBuilder(100, -1, ISO_8859_1);
         assertEquals(100, bab.internalArray().length);
 
         bab = new ByteArrayBuilder(100, -1, StandardCharsets.UTF_8);
