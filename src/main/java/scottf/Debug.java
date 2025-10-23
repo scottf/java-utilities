@@ -4,10 +4,7 @@ import io.nats.client.Connection;
 import io.nats.client.JetStreamApiException;
 import io.nats.client.JetStreamManagement;
 import io.nats.client.Message;
-import io.nats.client.api.ConsumerConfiguration;
-import io.nats.client.api.ConsumerInfo;
-import io.nats.client.api.SequenceInfo;
-import io.nats.client.api.StreamInfo;
+import io.nats.client.api.*;
 import io.nats.client.impl.Headers;
 import io.nats.client.impl.NatsJetStreamMetaData;
 import io.nats.client.impl.NatsMessage;
@@ -15,7 +12,10 @@ import io.nats.client.support.DateTimeUtils;
 import io.nats.client.support.JsonSerializable;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static io.nats.client.support.DateTimeUtils.toRfc3339;
@@ -29,9 +29,10 @@ public abstract class Debug {
     }
 
     public static final int NO_TIME = 0;
-    public static final int REGULAR_TIME = 1;
-    public static final int RFC_TIME = -1;
-    public static final int RFC_SHORT_TIME = -2;
+    public static final int MILLIS_TIME = 1;
+    public static final int SIMPLE_TIME = 2;
+    public static final int RFC_DATE_TIME = 3;
+    public static final int RFC_TIME = 4;
 
     public static final String SEP = " | ";
     public static final String DIV = "/";
@@ -39,7 +40,7 @@ public abstract class Debug {
     public static final String REPLACE = "\\Q%s\\E";
     public static boolean DO_NOT_TRUNCATE = true;
     public static boolean PRINT_THREAD_ID = true;
-    public static int TIME_TYPE = REGULAR_TIME;
+    public static int TIME_TYPE = SIMPLE_TIME;
     public static boolean PAUSE = false;
     public static DebugPrinter DEBUG_PRINTER = System.out::println;
     public static int MAX_DATA_DISPLAY = 50;
@@ -51,11 +52,11 @@ public abstract class Debug {
     }
 
     public static void msg(Message msg, Object... extras) {
-        info(null, msg, true, stringify(extras, false));
+        info(null, msg, true, extras, false);
     }
 
     public static void msg(String label, Message msg, Object... extras) {
-        info(label, msg, true, stringify(extras, false));
+        info(label, msg, true, extras, false);
     }
 
     public static void stackTrace(String label) {
@@ -105,17 +106,17 @@ public abstract class Debug {
     public static void info(String label, Object... extras) {
         if (PAUSE) { return; }
         if (extras == null || extras.length == 0) {
-            info(label, null, false, null);
+            info(label, null, false, null, false);
         }
         else if (extras[0] instanceof NatsMessage) {
-            info(label, (NatsMessage)extras[0], true, stringify(extras, true));
+            info(label, (NatsMessage)extras[0], true, extras, true);
         }
         else {
-            info(label, null, false, stringify(extras, false));
+            info(label, null, false, extras, false);
         }
     }
 
-    public static void info(String label, Message msg, boolean forMsg, String extra) {
+    public static void info(String label, Message msg, boolean forMsg, Object[] extras, boolean skipFirst) {
         if (PAUSE) { return; }
         String start;
         if (TIME_TYPE > NO_TIME && PRINT_THREAD_ID) {
@@ -131,13 +132,6 @@ public abstract class Debug {
             start = "";
         }
 
-        if (extra == null) {
-            extra = "";
-        }
-        else {
-            extra = SEP + extra;
-        }
-
         if (label != null) {
             label = label.trim();
         }
@@ -146,6 +140,16 @@ public abstract class Debug {
         }
         else {
             label = start + label;
+        }
+
+        int indent = label.length() + 1;
+        String extra = stringify(indent, extras, skipFirst);
+
+        if (extra == null) {
+            extra = "";
+        }
+        else {
+            extra = SEP + extra;
         }
 
         if (msg == null) {
@@ -170,7 +174,7 @@ public abstract class Debug {
         else {
             DEBUG_PRINTER.println(label + sidString(msg) + msgInfoString(msg) + dataString(msg) + replyToString(msg) + extra);
         }
-        debugHdr(label.length() + 1, msg);
+        debugHdr(indent, msg);
     }
 
     private static String messageString(Message msg) {
@@ -216,27 +220,43 @@ public abstract class Debug {
 
     public static String time() {
         switch (TIME_TYPE) {
+            case RFC_DATE_TIME: return rfcDateTime();
             case RFC_TIME: return rfcTime();
-            case RFC_SHORT_TIME: return rfcShortTime();
+            case SIMPLE_TIME: return simpleTime();
         }
         return "" + System.currentTimeMillis();
     }
 
     // RFC 2025-02-15T14:09:45
-    public static String rfcTime() {
+    public static String rfcDateTime() {
         return toRfc3339(DateTimeUtils.gmtNow()).substring(0, 19);
     }
 
-    public static String rfcTime(ZonedDateTime zdt) {
+    public static String rfcDateTime(ZonedDateTime zdt) {
         return toRfc3339(zdt).substring(0, 19);
     }
 
-    public static String rfcShortTime() {
-        return rfcShortTime(DateTimeUtils.gmtNow());
+    public static String rfcTime() {
+        return rfcTime(DateTimeUtils.gmtNow());
     }
 
-    public static String rfcShortTime(ZonedDateTime zdt) {
-        return toRfc3339(zdt).substring(0, 19).replace("-", "").replace(":", "");
+    public static String rfcTime(ZonedDateTime zdt) {
+        return toRfc3339(zdt).substring(11);
+    }
+
+    public static final ZoneId ZONE_ID_GMT = ZoneId.of("GMT");
+    public static final DateTimeFormatter SIMPLE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
+
+    public static String simpleTime(long javaTime) {
+        return SIMPLE_TIME_FORMATTER.format(ZonedDateTime.ofInstant(Instant.ofEpochMilli(javaTime), ZONE_ID_GMT));
+    }
+
+    public static String simpleTime() {
+        return SIMPLE_TIME_FORMATTER.format(DateTimeUtils.gmtNow());
+    }
+
+    public static String simpleTime(ZonedDateTime zdt) {
+        return SIMPLE_TIME_FORMATTER.format(zdt);
     }
 
     public static String dataString(Message msg) {
@@ -263,36 +283,43 @@ public abstract class Debug {
         return s.substring(at, at2) + SEP;
     }
 
-    public static String stringify(Object[] extras, boolean skipFirst) {
+    public static String stringify(int indent, Object[] extras, boolean skipFirst) {
         if (extras == null || extras.length == 0) {
             return null;
         }
 
         if (extras.length == 1) {
-            return skipFirst ? null : getString(extras[0]);
+            return skipFirst || extras[0] == null ? null : getString(indent, extras[0]);
         }
 
         boolean notFirst = false;
         StringBuilder sb = new StringBuilder();
         for (int i = (skipFirst ? 1 : 0); i < extras.length; i++) {
-            if (notFirst) {
-                sb.append(SEP);
-            }
-            else {
-                notFirst = true;
-            }
+            Object xi = extras[i];
+            if (xi != null) {
+                if (notFirst) {
+                    sb.append(SEP);
+                }
+                else {
+                    notFirst = true;
+                }
 
-            String xtra = getString(extras[i]);
-            while (xtra.contains("%s")) {
-                xtra = xtra.replaceFirst(REPLACE, getString(extras[++i]));
+                String xtra = getString(indent, extras[i]);
+                while (xtra.contains("%s")) {
+                    xtra = xtra.replaceFirst(REPLACE, getString(indent, extras[++i]));
+                }
+                sb.append(xtra);
             }
-            sb.append(xtra);
         }
 
         return sb.length() == 0 ? null : sb.toString();
     }
 
     public static String getString(Object o) {
+        return getString(0, o);
+    }
+
+    public static String getString(int indent, Object o) {
         if (o == null) {
             return "null";
         }
@@ -311,6 +338,9 @@ public abstract class Debug {
         }
         if (o instanceof SequenceInfo) {
             return sequenceInfoString((SequenceInfo)o);
+        }
+        if (o instanceof ServerInfo) {
+            return serverInfoString(indent, (ServerInfo)o);
         }
         if (o instanceof NatsJetStreamMetaData) {
             return metaDataString((NatsJetStreamMetaData)o);
@@ -486,6 +516,15 @@ public abstract class Debug {
                 ", pending=" + meta.pendingCount() +
                 ", timestamp=" + zdtString(meta.timestamp()) +
                 '}';
+    }
+
+    private static String serverInfoString(int indent, ServerInfo si) {
+        String pad = PAD.substring(0, indent);
+        return si.toString()
+            .replace("ServerInfo{", "ServerInfo ")
+            .replace(", ", "\n" + pad)
+            .replace("}", "")
+            ;
     }
 
     public static String zdtString(ZonedDateTime zdt) {
