@@ -326,7 +326,9 @@ public abstract class Debug {
         if (o instanceof Message) {
             Message msg = (Message)o;
             if (msg.getSubject() == null) {
-                return msg.toString();
+                String s = msg.toString();
+                int at = s.indexOf(' ');
+                return at == -1 ? s : s.substring(0, at);
             }
             return msgInfoString(msg) + dataString(msg) + replyToString(msg);
         }
