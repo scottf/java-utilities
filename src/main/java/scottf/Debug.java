@@ -35,7 +35,7 @@ public abstract class Debug {
     public static final int MILLIS_TIME = 4;
 
     public static String SEP = " | ";
-    public static String PART_SEP = " • ";
+    public static String PART_SEP = " / ";
     public static String DIV = "/";
     public static String PAD = "                                                                                                                                                                                                                                                                                                                                                                                                                                    ";
     public static String REPLACE = "\\Q%s\\E";
@@ -220,7 +220,7 @@ public abstract class Debug {
 
         if (data[0] < 32) {
             // this must be actual binary data, probably filler test data
-            return "<binary " + data.length + " bytes>";
+            return "<binary " + data.length + " byte(s)>";
         }
 
         String s = new String(data, UTF_8);
