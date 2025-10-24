@@ -122,10 +122,10 @@ public abstract class Debug {
         if (PAUSE) { return; }
         String start;
         if (TIME_TYPE > NO_TIME && PRINT_THREAD_ID) {
-            start = "[" +getThreadName() + "@" + time() + "] ";
+            start = "[" + getThreadName() + "@" + time(TIME_TYPE) + "] ";
         }
-        else if (TIME_TYPE > NO_TIME){
-            start = "[" + time() + "] ";
+        else if (TIME_TYPE > NO_TIME) {
+            start = "[" + time(TIME_TYPE) + "] ";
         }
         else if (PRINT_THREAD_ID){
             start = "[" + getThreadName() + "] ";
@@ -256,12 +256,16 @@ public abstract class Debug {
     }
 
     public static String time() {
-        switch (TIME_TYPE) {
+        return simpleTime();
+    }
+
+    public static String time(int type) {
+        switch (type) {
             case RFC_DATE_TIME: return rfcDateTime();
             case RFC_TIME: return rfcTime();
-            case SIMPLE_TIME: return simpleTime();
+            case MILLIS_TIME: return "" + System.currentTimeMillis();
+            case SIMPLE_TIME: default: return simpleTime();
         }
-        return "" + System.currentTimeMillis();
     }
 
     // RFC 2025-02-15T14:09:45
