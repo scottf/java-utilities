@@ -173,14 +173,6 @@ public abstract class Debug {
         debugHdr(indent, msg);
     }
 
-    public static void warn(String label, Object... extras) {
-        info(label, extras);
-    }
-
-    public static void warn(String label, Message msg, boolean forMsg, String extra) {
-        info(label, msg, forMsg, extra);
-    }
-
     private static String getThreadName() {
         return Thread.currentThread().getName().replace("-thread-", "-");
     }
