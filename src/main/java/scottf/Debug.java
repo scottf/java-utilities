@@ -42,6 +42,7 @@ public abstract class Debug {
     public static boolean DO_NOT_TRUNCATE = true;
     public static boolean PRINT_THREAD_ID = true;
     public static int TIME_TYPE = SIMPLE_TIME;
+    public static String DEFAULT_MESSAGE_LABEL = "MSG";
     public static boolean PAUSE = false;
     public static DebugPrinter DEBUG_PRINTER = System.out::println;
     public static int MAX_DATA_DISPLAY = 50;
@@ -49,11 +50,11 @@ public abstract class Debug {
     private Debug() {}  /* ensures cannot be constructed */
 
     public static void msg(Message msg) {
-        info("MSG", msg, true, null);
+        info(DEFAULT_MESSAGE_LABEL, msg, true, null);
     }
 
     public static void msg(Message msg, Object... extras) {
-        info("MSG", msg, true, extras, false);
+        info(DEFAULT_MESSAGE_LABEL, msg, true, extras, false);
     }
 
     public static void msg(String label, Message msg, Object... extras) {
@@ -121,13 +122,13 @@ public abstract class Debug {
         if (PAUSE) { return; }
         String start;
         if (TIME_TYPE > NO_TIME && PRINT_THREAD_ID) {
-            start = "[" + Thread.currentThread().getName() + "@" + time() + "] ";
+            start = "[" +getThreadName() + "@" + time() + "] ";
         }
         else if (TIME_TYPE > NO_TIME){
             start = "[" + time() + "] ";
         }
         else if (PRINT_THREAD_ID){
-            start = "[" + Thread.currentThread().getName() + "] ";
+            start = "[" + getThreadName() + "] ";
         }
         else {
             start = "";
@@ -178,6 +179,10 @@ public abstract class Debug {
 
     public static void warn(String label, Message msg, boolean forMsg, String extra) {
         info(label, msg, forMsg, extra);
+    }
+
+    private static String getThreadName() {
+        return Thread.currentThread().getName().replace("-thread-", "-");
     }
 
     private static String messageString(Message msg) {
@@ -289,6 +294,10 @@ public abstract class Debug {
 
     public static String simpleTime(ZonedDateTime zdt) {
         return SIMPLE_TIME_FORMATTER.format(zdt);
+    }
+
+    public static String stringify(Object... extras) {
+        return stringify(0, extras, false);
     }
 
     public static String stringify(int indent, Object[] extras, boolean skipFirst) {
