@@ -5,40 +5,47 @@ import io.nats.client.ReadListener;
 
 public class DebugReadListener implements ReadListener {
     String label;
-    boolean protoOnly;
+    boolean proto;
+    boolean regular;
+    boolean js;
 
     public DebugReadListener() {
-        this(null);
-    }
-
-    public DebugReadListener(boolean protoOnly) {
-        label(label);
-        this.protoOnly = protoOnly;
+        this(null, true, true, true);
     }
 
     public DebugReadListener(String label) {
+        this(label, true, true, true);
+    }
+
+    public DebugReadListener(boolean proto, boolean regular, boolean js) {
+        this(null, proto, regular, js);
+    }
+
+    public DebugReadListener(String label, boolean proto, boolean regular, boolean js) {
         label(label);
+        this.proto = proto;
+        this.regular = regular;
+        this.js = js;
     }
 
     public void label(String rlLabel) {
         this.label = rlLabel == null ? "RL" : rlLabel;
     }
 
-    public void protoOnly(boolean protoOnly) {
-        this.protoOnly = protoOnly;
-    }
-
     @Override
-    public void protocol(String op, String string) {
-        if (label != null) {
-            Debug.info(label + "-P", op, string);
+    public void protocol(String op, String text) {
+        if (proto) {
+            Debug.info(label + "/P", op, text);
         }
     }
 
     @Override
     public void message(String op, Message message) {
-        if (!protoOnly && label != null) {
-            Debug.msg(label + "-M", message);
+        if (regular && !message.isJetStream()) {
+            Debug.msg(label + "/M", message);
+        }
+        else if (js && message.isJetStream()) {
+            Debug.msg(label + "/JsM", message);
         }
     }
 }
